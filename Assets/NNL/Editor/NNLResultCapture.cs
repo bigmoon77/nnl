@@ -100,6 +100,7 @@ public static class NNLResultCapture
             bool screenshotSaved = capturePreview(screenshotPath);
 
             string scenePath = SceneManager.GetActiveScene().path;
+            NNLExperimentCapture.Write(outputDirectory, scenePath);
             string manifest = "{\n" +
                 "  \"captured_at\": \"" + DateTime.Now.ToString("o") + "\",\n" +
                 "  \"unity_version\": \"" + escapeJson(Application.unityVersion) + "\",\n" +
@@ -107,7 +108,9 @@ public static class NNLResultCapture
                 "  \"is_playing\": " + (Application.isPlaying ? "true" : "false") + ",\n" +
                 "  \"active_scene\": \"" + escapeJson(scenePath) + "\",\n" +
                 "  \"log_entries\": " + capturedLogCount + ",\n" +
-                "  \"preview_saved\": " + (screenshotSaved ? "true" : "false") + "\n" +
+                "  \"preview_saved\": " + (screenshotSaved ? "true" : "false") + ",\n" +
+                "  \"experiment_report_saved\": true,\n" +
+                "  \"weights_csv_saved\": true\n" +
                 "}\n";
 
             File.WriteAllText(Path.Combine(outputDirectory, "manifest.json"), manifest, new UTF8Encoding(false));
@@ -276,6 +279,9 @@ public static class NNLResultCaptureSettings
 {
     private const string autoCaptureKey = "NNL.AutoCaptureOnPlayStop";
     private const string autoPushKey = "NNL.AutoPushToGitHub";
+    private const string experimentNameKey = "NNL.ExperimentName";
+    private const string trainingParametersKey = "NNL.TrainingParameters";
+    private const string experimentNotesKey = "NNL.ExperimentNotes";
 
     public static bool AutoCaptureOnPlayStop
     {
@@ -287,6 +293,24 @@ public static class NNLResultCaptureSettings
     {
         get { return EditorPrefs.GetBool(autoPushKey, false); }
         set { EditorPrefs.SetBool(autoPushKey, value); }
+    }
+
+    public static string ExperimentName
+    {
+        get { return EditorPrefs.GetString(experimentNameKey, "NNL Experiment"); }
+        set { EditorPrefs.SetString(experimentNameKey, value ?? string.Empty); }
+    }
+
+    public static string TrainingParameters
+    {
+        get { return EditorPrefs.GetString(trainingParametersKey, string.Empty); }
+        set { EditorPrefs.SetString(trainingParametersKey, value ?? string.Empty); }
+    }
+
+    public static string ExperimentNotes
+    {
+        get { return EditorPrefs.GetString(experimentNotesKey, string.Empty); }
+        set { EditorPrefs.SetString(experimentNotesKey, value ?? string.Empty); }
     }
 }
 
@@ -309,6 +333,14 @@ public sealed class NNLResultCaptureWindow : EditorWindow
             EditorGUILayout.Toggle("Auto capture on Play Stop", NNLResultCaptureSettings.AutoCaptureOnPlayStop);
         NNLResultCaptureSettings.AutoPushToGitHub =
             EditorGUILayout.Toggle("Auto push to GitHub", NNLResultCaptureSettings.AutoPushToGitHub);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Experiment Metadata", EditorStyles.boldLabel);
+        NNLResultCaptureSettings.ExperimentName = EditorGUILayout.TextField("Experiment Name", NNLResultCaptureSettings.ExperimentName);
+        EditorGUILayout.LabelField("Training Parameters");
+        NNLResultCaptureSettings.TrainingParameters = EditorGUILayout.TextArea(NNLResultCaptureSettings.TrainingParameters, GUILayout.MinHeight(60));
+        EditorGUILayout.LabelField("Experiment Notes");
+        NNLResultCaptureSettings.ExperimentNotes = EditorGUILayout.TextArea(NNLResultCaptureSettings.ExperimentNotes, GUILayout.MinHeight(60));
 
         EditorGUILayout.Space();
         if (GUILayout.Button("Capture & Push Now", GUILayout.Height(32)))
