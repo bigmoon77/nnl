@@ -23,12 +23,6 @@ public static class NNLResultCapture
         EditorApplication.playModeStateChanged += onPlayModeStateChanged;
     }
 
-    [MenuItem("NNL/Result Capture")]
-    private static void openWindow()
-    {
-        NNLResultCaptureWindow.ShowWindow();
-    }
-
     private static void onLogMessageReceived(string condition, string stackTrace, LogType type)
     {
         string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
@@ -278,7 +272,7 @@ public static class NNLResultCapture
     }
 }
 
-public sealed class NNLResultCaptureSettings : ScriptableObject
+public static class NNLResultCaptureSettings
 {
     private const string autoCaptureKey = "NNL.AutoCaptureOnPlayStop";
     private const string autoPushKey = "NNL.AutoPushToGitHub";
