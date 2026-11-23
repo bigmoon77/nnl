@@ -190,6 +190,9 @@ public static class NNLResultCapture
 
     private static string commitAndPush(string projectRoot, string outputDirectory, bool pushToRemote)
     {
+        if (!pushToRemote)
+            return "Saved locally. Automatic GitHub push is disabled.";
+
         string gitRoot = runGit(projectRoot, "rev-parse --show-toplevel", out int rootExitCode);
         if (rootExitCode != 0)
             return "Git push skipped: project is not inside a Git repository.";
@@ -220,9 +223,6 @@ public static class NNLResultCapture
         {
             return "Could not inspect staged GPTShare changes.";
         }
-
-        if (!pushToRemote)
-            return "Saved and committed locally. Automatic GitHub push is disabled.";
 
         string branch = runGit(gitRoot, "rev-parse --abbrev-ref HEAD", out int branchExitCode).Trim();
         if (branchExitCode != 0 || string.IsNullOrEmpty(branch) || branch == "HEAD")
