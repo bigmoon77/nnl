@@ -12,9 +12,10 @@ Each capture creates a timestamped directory:
 
 Open **NNL > Result Capture Window** in Unity.
 
-- **Auto capture and push on Play Stop** is enabled by default.
-- **Capture & Push Now** creates a result bundle immediately.
-- The editor tool commits and pushes only this `GPTShare/` folder to the current branch's `origin` remote.
+- **Auto capture on Play Stop** is enabled by default and saves a local result bundle.
+- **Auto push to GitHub** is disabled by default because the `nnl` repository is public.
+- **Capture & Push Now** creates a result bundle, commits it, and pushes it immediately.
+- When automatic push is enabled, the tool commits and pushes only this `GPTShare/` folder to the current branch's `origin` remote.
 - Other staged or unstaged project changes are not included in the capture commit.
 
 Git for Windows must be installed and the repository's `origin` authentication must already be configured.
