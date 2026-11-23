@@ -24,6 +24,7 @@ public static class NNLExperimentCapture
         json.AppendLine("  \"scene\": \"" + escapeJson(scenePath) + "\",");
         json.AppendLine("  \"training_parameters\": \"" + escapeJson(NNLResultCaptureSettings.TrainingParameters) + "\",");
         json.AppendLine("  \"notes\": \"" + escapeJson(NNLResultCaptureSettings.ExperimentNotes) + "\",");
+        json.AppendLine("  \"output_activation\": \"Linear + Saturate\",");
         json.AppendLine("  \"inference_reference\": \"CPU evaluation of captured 4-8-3 weights; not a GPU readback\",");
         json.AppendLine("  \"materials\": [");
 
