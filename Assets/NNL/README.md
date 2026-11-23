@@ -24,7 +24,7 @@ The network takes four values:
 - World-space normal X, Y, Z.
 - Signed dot product between the world normal and the main directional-light direction.
 
-The network uses eight ReLU hidden units and three output units (RGB). The current example weights are hand-authored to produce a simple normal/light-dependent color response. They are a data-layout and inference smoke test, not trained weights.
+The network uses eight ReLU hidden units and three linear output units (RGB), followed by `saturate()` in the fragment shader. The output activation is therefore **Linear + Saturate**, not Sigmoid. The current example weights are hand-authored to produce a simple normal/light-dependent color response. They are a data-layout and inference smoke test, not trained weights.
 
 ### Weight texture layout
 
@@ -54,10 +54,12 @@ The shader samples texel centers with explicit LOD 0. The texture uses point fil
 2. Add an external weight exporter/training format.
 3. Benchmark fragment cost at multiple avatar screen sizes.
 4. Investigate feasible temporal reuse and upscaling within VRChat avatar shader constraints.
-5. Document the shader data contract for a future engine port.
+5. Build a path-traced reference dataset for indirect illumination and train a network to approximate it.
+6. Export trained weights and evaluate shader inference against held-out path-traced samples.
+7. Document the shader data contract for a future engine port.
 
 ## GPT result sharing
 
 The Editor tools `Editor/NNLResultCapture.cs` and `Editor/NNLExperimentCapture.cs` capture Console output, a preview image, experiment metadata, active-scene NNL materials, and their weight textures when Play Mode stops. Timestamped bundles are written to the repository-root `GPTShare/` folder.
 
-Open **NNL > Result Capture Window** to configure capture and push behavior and enter an experiment name, training parameters, and notes. These fields are saved in EditorPrefs and included in each capture. Each bundle contains `console.txt`, `preview.png`, `manifest.json`, `experiment.json`, `weights.csv`, and `inference_reference.csv`. The weights CSV exports every readable texel from `_NNLWeights` textures used by NNL materials in the active scene. The inference CSV evaluates eight deterministic normal samples on the CPU using the captured 4-8-3 weights and the active scene directional light; it is a reference calculation, not a GPU shader readback or a performance benchmark. Automatic local capture is enabled by default; automatic GitHub push is disabled by default because this repository is public. **Capture & Push Now** explicitly commits and pushes the shared folder. See `../../GPTShare/README.md` for details.
+Open **NNL > Result Capture Window** to configure capture and push behavior and enter an experiment name, training parameters, and notes. These fields are saved in EditorPrefs and included in each capture. Each bundle contains `console.txt`, `preview.png`, `manifest.json`, `experiment.json`, `weights.csv`, and `inference_reference.csv`. The weights CSV exports every readable texel from `_NNLWeights` textures used by NNL materials in the active scene. The experiment JSON records the shader output activation (`Linear + Saturate`). The inference CSV evaluates eight deterministic normal samples on the CPU using the captured 4-8-3 weights and the active scene directional light; it is a reference calculation, not a GPU shader readback or a performance benchmark. Automatic local capture is enabled by default; automatic GitHub push is disabled by default because this repository is public. **Capture & Push Now** explicitly commits and pushes the shared folder. See `../../GPTShare/README.md` for details.
