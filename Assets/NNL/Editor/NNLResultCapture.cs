@@ -110,7 +110,8 @@ public static class NNLResultCapture
                 "  \"log_entries\": " + capturedLogCount + ",\n" +
                 "  \"preview_saved\": " + (screenshotSaved ? "true" : "false") + ",\n" +
                 "  \"experiment_report_saved\": true,\n" +
-                "  \"weights_csv_saved\": true\n" +
+                "  \"weights_csv_saved\": true,\n" +
+                "  \"inference_reference_saved\": true\n" +
                 "}\n";
 
             File.WriteAllText(Path.Combine(outputDirectory, "manifest.json"), manifest, new UTF8Encoding(false));
@@ -351,7 +352,7 @@ public sealed class NNLResultCaptureWindow : EditorWindow
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Output", "ProjectRoot/GPTShare/<timestamp>/");
-        EditorGUILayout.LabelField("Files", "console.txt / preview.png / manifest.json");
+        EditorGUILayout.LabelField("Files", "console.txt / preview.png / manifest.json / experiment.json / weights.csv / inference_reference.csv");
         EditorGUILayout.HelpBox(
             "Git操作はGPTShareフォルダだけを対象にします。現在のnnlリポジトリはPublicです。自動Pushを有効にするとログと画像も公開されます。",
             MessageType.None);
