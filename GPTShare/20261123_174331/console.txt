@@ -1,0 +1,8 @@
+[17:43:23.494] [Log] NNL_CAPTURE_TEST
+UnityEngine.Debug:Log (object)
+NNLTestAvatarBuilder:BuildTestAvatar () (at Assets/NNL/Editor/NNLTestAvatarBuilder.cs:20)
+
+
+[17:43:23.871] [Log] NNL test avatar scene created: Assets/NNL/Scenes/NNL_TestAvatar.unity
+UnityEngine.Debug:Log (object)
+NNLTestAvatarBuilder:BuildTestAvatar () (at Assets/NNL/Editor/NNLTestAvatarBuilder.cs:103)
