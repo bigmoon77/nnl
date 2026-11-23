@@ -9,6 +9,7 @@ public static class NNLTestAvatarBuilder
     private const string RootPath = "Assets/NNL";
     private const string GeneratedPath = RootPath + "/Generated";
     private const string MaterialPath = GeneratedPath + "/NNL_Test.mat";
+    private const string GroundMaterialPath = GeneratedPath + "/NNL_Ground.mat";
     private const string WeightsPath = GeneratedPath + "/NNL_TestWeights.asset";
     private const string ScenePath = RootPath + "/Scenes/NNL_TestAvatar.unity";
     private const string ShaderName = "NNL/Unlit MLP";
@@ -64,8 +65,14 @@ public static class NNLTestAvatarBuilder
         ground.name = "Ground";
         ground.transform.position = new Vector3(0.0f, -0.08f, 0.0f);
         ground.transform.localScale = new Vector3(4.0f, 1.0f, 4.0f);
-        Material groundMaterial = new Material(Shader.Find("Standard"));
+        Material groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GroundMaterialPath);
+        if (groundMaterial == null)
+        {
+            groundMaterial = new Material(Shader.Find("Standard"));
+            AssetDatabase.CreateAsset(groundMaterial, GroundMaterialPath);
+        }
         groundMaterial.color = new Color(0.22f, 0.24f, 0.27f);
+        EditorUtility.SetDirty(groundMaterial);
         ground.GetComponent<Renderer>().sharedMaterial = groundMaterial;
 
         GameObject lightObject = new GameObject("Directional Light");
