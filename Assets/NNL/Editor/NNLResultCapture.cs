@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -86,8 +85,12 @@ public static class NNLResultCapture
             Directory.CreateDirectory(outputDirectory);
 
             string logText;
+            int capturedLogCount;
             lock (logLock)
+            {
+                capturedLogCount = logEntries.Count;
                 logText = string.Join(Environment.NewLine + Environment.NewLine, logEntries);
+            }
 
             if (string.IsNullOrEmpty(logText))
                 logText = "(No Unity Console messages were captured.)";
@@ -104,7 +107,7 @@ public static class NNLResultCapture
                 "  \"platform\": \"" + escapeJson(Application.platform.ToString()) + "\",\n" +
                 "  \"is_playing\": " + (Application.isPlaying ? "true" : "false") + ",\n" +
                 "  \"active_scene\": \"" + escapeJson(scenePath) + "\",\n" +
-                "  \"log_entries\": " + logEntries.Count + ",\n" +
+                "  \"log_entries\": " + capturedLogCount + ",\n" +
                 "  \"preview_saved\": " + (screenshotSaved ? "true" : "false") + "\n" +
                 "}\n";
 
@@ -269,8 +272,12 @@ public static class NNLResultCapture
 
 public sealed class NNLResultCaptureSettings : ScriptableObject
 {
-    private const string settingsPath = "ProjectSettings/NNLResultCaptureSettings.asset";
-    public static bool autoCaptureAndPush = true;
+    private const string preferenceKey = "NNL.AutoCaptureAndPush";
+    public static bool autoCaptureAndPush
+    {
+        get { return EditorPrefs.GetBool(preferenceKey, true); }
+        set { EditorPrefs.SetBool(preferenceKey, value); }
+    }
 }
 
 public sealed class NNLResultCaptureWindow : EditorWindow
