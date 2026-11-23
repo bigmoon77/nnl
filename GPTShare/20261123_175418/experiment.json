@@ -4,6 +4,7 @@
   "scene": "Assets/NNL/Scenes/NNL_TestAvatar.unity",
   "training_parameters": "network: MLP\ntopology: 4-8-3\nactivation: ReLU\noutput_activation: Sigmoid\noptimizer: none (hand-authored weights)\nweight_format: RGBAFloat\ntexture_size: 3x11\ninference: fragment shader",
   "notes": "初期Shaderの描画確認。\n入力はWorld Normal XYZとNdotL。\n手動設定した重みでライティング表現を確認する。",
+  "output_activation": "Linear + Saturate",
   "inference_reference": "CPU evaluation of captured 4-8-3 weights; not a GPU readback",
   "materials": [
     {
