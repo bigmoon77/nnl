@@ -55,3 +55,9 @@ The shader samples texel centers with explicit LOD 0. The texture uses point fil
 3. Benchmark fragment cost at multiple avatar screen sizes.
 4. Investigate feasible temporal reuse and upscaling within VRChat avatar shader constraints.
 5. Document the shader data contract for a future engine port.
+
+## GPT result sharing
+
+The Editor tool at `Editor/NNLResultCapture.cs` automatically captures Console output and a preview image when Play Mode stops. It writes timestamped bundles to the repository-root `GPTShare/` folder and commits/pushes only that folder to the current branch's `origin` remote.
+
+Open **NNL > Result Capture Window** to change the automatic behavior or use **Capture & Push Now**. See `../../GPTShare/README.md` for the output format and Git requirements.
