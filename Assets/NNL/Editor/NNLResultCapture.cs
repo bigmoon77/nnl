@@ -58,13 +58,13 @@ public static class NNLResultCapture
             lock (logLock)
                 logEntries.Clear();
         }
-        else if (state == PlayModeStateChange.ExitingPlayMode && NNLResultCaptureSettings.autoCaptureOnPlayStop)
+        else if (state == PlayModeStateChange.ExitingPlayMode && NNLResultCaptureSettings.AutoCaptureOnPlayStop)
         {
-            capture(NNLResultCaptureSettings.autoPushToGitHub);
+            capture(NNLResultCaptureSettings.AutoPushToGitHub);
         }
     }
 
-    public static string captureAndPush()
+    public static string CaptureAndPush()
     {
         return capture(true);
     }
@@ -277,13 +277,13 @@ public static class NNLResultCaptureSettings
     private const string autoCaptureKey = "NNL.AutoCaptureOnPlayStop";
     private const string autoPushKey = "NNL.AutoPushToGitHub";
 
-    public static bool autoCaptureOnPlayStop
+    public static bool AutoCaptureOnPlayStop
     {
         get { return EditorPrefs.GetBool(autoCaptureKey, true); }
         set { EditorPrefs.SetBool(autoCaptureKey, value); }
     }
 
-    public static bool autoPushToGitHub
+    public static bool AutoPushToGitHub
     {
         get { return EditorPrefs.GetBool(autoPushKey, false); }
         set { EditorPrefs.SetBool(autoPushKey, value); }
@@ -305,15 +305,15 @@ public sealed class NNLResultCaptureWindow : EditorWindow
             "Play Mode終了時にConsoleログとGame View画像をGPTShareへ保存します。GitHubへの自動Pushは別設定です。",
             MessageType.Info);
 
-        NNLResultCaptureSettings.autoCaptureOnPlayStop =
-            EditorGUILayout.Toggle("Auto capture on Play Stop", NNLResultCaptureSettings.autoCaptureOnPlayStop);
-        NNLResultCaptureSettings.autoPushToGitHub =
-            EditorGUILayout.Toggle("Auto push to GitHub", NNLResultCaptureSettings.autoPushToGitHub);
+        NNLResultCaptureSettings.AutoCaptureOnPlayStop =
+            EditorGUILayout.Toggle("Auto capture on Play Stop", NNLResultCaptureSettings.AutoCaptureOnPlayStop);
+        NNLResultCaptureSettings.AutoPushToGitHub =
+            EditorGUILayout.Toggle("Auto push to GitHub", NNLResultCaptureSettings.AutoPushToGitHub);
 
         EditorGUILayout.Space();
         if (GUILayout.Button("Capture & Push Now", GUILayout.Height(32)))
         {
-            string result = NNLResultCapture.captureAndPush();
+            string result = NNLResultCapture.CaptureAndPush();
             EditorUtility.DisplayDialog("NNL Result Capture", result, "OK");
         }
 
