@@ -64,13 +64,18 @@ public static class NNLResultCapture
             lock (logLock)
                 logEntries.Clear();
         }
-        else if (state == PlayModeStateChange.ExitingPlayMode && NNLResultCaptureSettings.autoCaptureAndPush)
+        else if (state == PlayModeStateChange.ExitingPlayMode && NNLResultCaptureSettings.autoCaptureOnPlayStop)
         {
-            captureAndPush();
+            capture(NNLResultCaptureSettings.autoPushToGitHub);
         }
     }
 
     public static string captureAndPush()
+    {
+        return capture(true);
+    }
+
+    private static string capture(bool pushToRemote)
     {
         if (isCapturing)
             return "Capture is already running.";
@@ -113,7 +118,7 @@ public static class NNLResultCapture
 
             File.WriteAllText(Path.Combine(outputDirectory, "manifest.json"), manifest, new UTF8Encoding(false));
 
-            string gitResult = commitAndPush(projectRoot, outputDirectory);
+            string gitResult = commitAndPush(projectRoot, outputDirectory, pushToRemote);
             string message = "Saved result: " + outputDirectory + Environment.NewLine + gitResult;
             UnityEngine.Debug.Log(message);
             return message;
@@ -189,7 +194,7 @@ public static class NNLResultCapture
             .Replace("\r", "\\r").Replace("\n", "\\n");
     }
 
-    private static string commitAndPush(string projectRoot, string outputDirectory)
+    private static string commitAndPush(string projectRoot, string outputDirectory, bool pushToRemote)
     {
         string gitRoot = runGit(projectRoot, "rev-parse --show-toplevel", out int rootExitCode);
         if (rootExitCode != 0)
@@ -221,6 +226,9 @@ public static class NNLResultCapture
         {
             return "Could not inspect staged GPTShare changes.";
         }
+
+        if (!pushToRemote)
+            return "Saved and committed locally. Automatic GitHub push is disabled.";
 
         string branch = runGit(gitRoot, "rev-parse --abbrev-ref HEAD", out int branchExitCode).Trim();
         if (branchExitCode != 0 || string.IsNullOrEmpty(branch) || branch == "HEAD")
@@ -272,11 +280,19 @@ public static class NNLResultCapture
 
 public sealed class NNLResultCaptureSettings : ScriptableObject
 {
-    private const string preferenceKey = "NNL.AutoCaptureAndPush";
-    public static bool autoCaptureAndPush
+    private const string autoCaptureKey = "NNL.AutoCaptureOnPlayStop";
+    private const string autoPushKey = "NNL.AutoPushToGitHub";
+
+    public static bool autoCaptureOnPlayStop
     {
-        get { return EditorPrefs.GetBool(preferenceKey, true); }
-        set { EditorPrefs.SetBool(preferenceKey, value); }
+        get { return EditorPrefs.GetBool(autoCaptureKey, true); }
+        set { EditorPrefs.SetBool(autoCaptureKey, value); }
+    }
+
+    public static bool autoPushToGitHub
+    {
+        get { return EditorPrefs.GetBool(autoPushKey, false); }
+        set { EditorPrefs.SetBool(autoPushKey, value); }
     }
 }
 
@@ -292,11 +308,13 @@ public sealed class NNLResultCaptureWindow : EditorWindow
     {
         EditorGUILayout.LabelField("GPT Shared Results", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
-            "Play Mode終了時にConsoleログとGame View画像をGPTShareへ保存し、Git commit/pushします。",
+            "Play Mode終了時にConsoleログとGame View画像をGPTShareへ保存します。GitHubへの自動Pushは別設定です。",
             MessageType.Info);
 
-        NNLResultCaptureSettings.autoCaptureAndPush =
-            EditorGUILayout.Toggle("Auto capture and push on Play Stop", NNLResultCaptureSettings.autoCaptureAndPush);
+        NNLResultCaptureSettings.autoCaptureOnPlayStop =
+            EditorGUILayout.Toggle("Auto capture on Play Stop", NNLResultCaptureSettings.autoCaptureOnPlayStop);
+        NNLResultCaptureSettings.autoPushToGitHub =
+            EditorGUILayout.Toggle("Auto push to GitHub", NNLResultCaptureSettings.autoPushToGitHub);
 
         EditorGUILayout.Space();
         if (GUILayout.Button("Capture & Push Now", GUILayout.Height(32)))
@@ -309,7 +327,7 @@ public sealed class NNLResultCaptureWindow : EditorWindow
         EditorGUILayout.LabelField("Output", "ProjectRoot/GPTShare/<timestamp>/");
         EditorGUILayout.LabelField("Files", "console.txt / preview.png / manifest.json");
         EditorGUILayout.HelpBox(
-            "Git操作はGPTShareフォルダだけを対象にします。Git for Windowsとoriginの認証設定が必要です。",
+            "Git操作はGPTShareフォルダだけを対象にします。現在のnnlリポジトリはPublicです。自動Pushを有効にするとログと画像も公開されます。",
             MessageType.None);
     }
 }
