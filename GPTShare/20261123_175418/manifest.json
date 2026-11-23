@@ -1,0 +1,12 @@
+{
+  "captured_at": "2026-11-23T17:54:18.5592542+09:00",
+  "unity_version": "2022.3.22f1",
+  "platform": "WindowsEditor",
+  "is_playing": true,
+  "active_scene": "Assets/NNL/Scenes/NNL_TestAvatar.unity",
+  "log_entries": 0,
+  "preview_saved": true,
+  "experiment_report_saved": true,
+  "weights_csv_saved": true,
+  "inference_reference_saved": true
+}
