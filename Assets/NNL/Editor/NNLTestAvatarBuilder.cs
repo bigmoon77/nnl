@@ -6,34 +6,34 @@ using UnityEngine.SceneManagement;
 
 public static class NNLTestAvatarBuilder
 {
-    private const string RootPath = "Assets/NNL";
-    private const string GeneratedPath = RootPath + "/Generated";
-    private const string MaterialPath = GeneratedPath + "/NNL_Test.mat";
-    private const string GroundMaterialPath = GeneratedPath + "/NNL_Ground.mat";
-    private const string WeightsPath = GeneratedPath + "/NNL_TestWeights.asset";
-    private const string ScenePath = RootPath + "/Scenes/NNL_TestAvatar.unity";
-    private const string ShaderName = "NNL/Unlit MLP";
+    private const string rootPath = "Assets/NNL";
+    private const string generatedPath = rootPath + "/Generated";
+    private const string materialPath = generatedPath + "/NNL_Test.mat";
+    private const string GroundmaterialPath = generatedPath + "/NNL_Ground.mat";
+    private const string weightsPath = generatedPath + "/NNL_TestWeights.asset";
+    private const string scenePath = rootPath + "/Scenes/NNL_TestAvatar.unity";
+    private const string shaderName = "NNL/Unlit MLP";
 
     [MenuItem("NNL/Build Test Avatar")]
     public static void BuildTestAvatar()
     {
-        EnsureDirectory(RootPath);
-        EnsureDirectory(GeneratedPath);
-        EnsureDirectory(RootPath + "/Scenes");
+        ensureDirectory(rootPath);
+        ensureDirectory(generatedPath);
+        ensureDirectory(rootPath + "/Scenes");
 
-        Shader shader = Shader.Find(ShaderName);
+        Shader shader = Shader.Find(shaderName);
         if (shader == null)
         {
             Debug.LogError("NNL shader was not found. Make sure NNL_UnlitMLP.shader has imported successfully.");
             return;
         }
 
-        Texture2D weights = CreateOrReplaceWeights();
-        Material material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
+        Texture2D weights = createOrReplaceWeights();
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if (material == null)
         {
             material = new Material(shader);
-            AssetDatabase.CreateAsset(material, MaterialPath);
+            AssetDatabase.CreateAsset(material, materialPath);
         }
 
         material.shader = shader;
@@ -46,30 +46,30 @@ public static class NNLTestAvatarBuilder
         GameObject avatar = new GameObject("NNL_TestAvatar");
         avatar.transform.position = Vector3.zero;
 
-        CreatePart(avatar.transform, "Torso", PrimitiveType.Capsule,
+        createPart(avatar.transform, "Torso", PrimitiveType.Capsule,
             new Vector3(0.0f, 1.25f, 0.0f), new Vector3(0.48f, 0.65f, 0.28f), Quaternion.identity, material);
-        CreatePart(avatar.transform, "Head", PrimitiveType.Sphere,
+        createPart(avatar.transform, "Head", PrimitiveType.Sphere,
             new Vector3(0.0f, 2.18f, 0.0f), new Vector3(0.34f, 0.38f, 0.32f), Quaternion.identity, material);
-        CreatePart(avatar.transform, "LeftArm", PrimitiveType.Capsule,
+        createPart(avatar.transform, "LeftArm", PrimitiveType.Capsule,
             new Vector3(-0.58f, 1.32f, 0.0f), new Vector3(0.16f, 0.48f, 0.16f),
             Quaternion.Euler(0.0f, 0.0f, 18.0f), material);
-        CreatePart(avatar.transform, "RightArm", PrimitiveType.Capsule,
+        createPart(avatar.transform, "RightArm", PrimitiveType.Capsule,
             new Vector3(0.58f, 1.32f, 0.0f), new Vector3(0.16f, 0.48f, 0.16f),
             Quaternion.Euler(0.0f, 0.0f, -18.0f), material);
-        CreatePart(avatar.transform, "LeftLeg", PrimitiveType.Capsule,
+        createPart(avatar.transform, "LeftLeg", PrimitiveType.Capsule,
             new Vector3(-0.19f, 0.48f, 0.0f), new Vector3(0.19f, 0.52f, 0.19f), Quaternion.identity, material);
-        CreatePart(avatar.transform, "RightLeg", PrimitiveType.Capsule,
+        createPart(avatar.transform, "RightLeg", PrimitiveType.Capsule,
             new Vector3(0.19f, 0.48f, 0.0f), new Vector3(0.19f, 0.52f, 0.19f), Quaternion.identity, material);
 
         GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
         ground.name = "Ground";
         ground.transform.position = new Vector3(0.0f, -0.08f, 0.0f);
         ground.transform.localScale = new Vector3(4.0f, 1.0f, 4.0f);
-        Material groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GroundMaterialPath);
+        Material groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(GroundmaterialPath);
         if (groundMaterial == null)
         {
             groundMaterial = new Material(Shader.Find("Standard"));
-            AssetDatabase.CreateAsset(groundMaterial, GroundMaterialPath);
+            AssetDatabase.CreateAsset(groundMaterial, GroundmaterialPath);
         }
         groundMaterial.color = new Color(0.22f, 0.24f, 0.27f);
         EditorUtility.SetDirty(groundMaterial);
@@ -95,16 +95,16 @@ public static class NNLTestAvatarBuilder
         Selection.activeGameObject = avatar;
 
         EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene, ScenePath);
+        EditorSceneManager.SaveScene(scene, scenePath);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log("NNL test avatar scene created: " + ScenePath);
+        Debug.Log("NNL test avatar scene created: " + scenePath);
     }
 
-    private static Texture2D CreateOrReplaceWeights()
+    private static Texture2D createOrReplaceWeights()
     {
-        AssetDatabase.DeleteAsset(WeightsPath);
+        AssetDatabase.DeleteAsset(weightsPath);
 
         // Layout: 3 x 11 RGBAFloat texels.
         // Rows 0..7: first-layer weights in x=0 and bias in x=1.r.
@@ -144,16 +144,16 @@ public static class NNLTestAvatarBuilder
         }
 
         // RGB output: 0.5 + 0.3 * normal component + 0.25 * max(N.L, 0).
-        SetOutputWeights(texture, 8, 0);
-        SetOutputWeights(texture, 9, 1);
-        SetOutputWeights(texture, 10, 2);
+        setOutputWeights(texture, 8, 0);
+        setOutputWeights(texture, 9, 1);
+        setOutputWeights(texture, 10, 2);
 
         texture.Apply(false, false);
-        AssetDatabase.CreateAsset(texture, WeightsPath);
-        return AssetDatabase.LoadAssetAtPath<Texture2D>(WeightsPath);
+        AssetDatabase.CreateAsset(texture, weightsPath);
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(weightsPath);
     }
 
-    private static void SetOutputWeights(Texture2D texture, int row, int channel)
+    private static void setOutputWeights(Texture2D texture, int row, int channel)
     {
         Vector4 weightsA = Vector4.zero;
         Vector4 weightsB = Vector4.zero;
@@ -180,7 +180,7 @@ public static class NNLTestAvatarBuilder
         texture.SetPixel(2, row, new Color(0.5f, 0.0f, 0.0f, 0.0f));
     }
 
-    private static void CreatePart(
+    private static void createPart(
         Transform parent,
         string partName,
         PrimitiveType primitiveType,
@@ -202,14 +202,14 @@ public static class NNLTestAvatarBuilder
             Object.DestroyImmediate(collider);
     }
 
-    private static void EnsureDirectory(string path)
+    private static void ensureDirectory(string path)
     {
         if (!AssetDatabase.IsValidFolder(path))
         {
             string parent = Path.GetDirectoryName(path).Replace("\\", "/");
             string folderName = Path.GetFileName(path);
             if (!AssetDatabase.IsValidFolder(parent))
-                EnsureDirectory(parent);
+                ensureDirectory(parent);
             AssetDatabase.CreateFolder(parent, folderName);
         }
     }
