@@ -58,6 +58,6 @@ The shader samples texel centers with explicit LOD 0. The texture uses point fil
 
 ## GPT result sharing
 
-The Editor tool at `Editor/NNLResultCapture.cs` automatically captures Console output and a preview image when Play Mode stops. It writes timestamped bundles to the repository-root `GPTShare/` folder.
+The Editor tools `Editor/NNLResultCapture.cs` and `Editor/NNLExperimentCapture.cs` capture Console output, a preview image, experiment metadata, active-scene NNL materials, and their weight textures when Play Mode stops. Timestamped bundles are written to the repository-root `GPTShare/` folder.
 
-Open **NNL > Result Capture Window** to configure capture and push behavior. Automatic local capture is enabled by default; automatic GitHub push is disabled by default because this repository is public. **Capture & Push Now** explicitly commits and pushes the shared folder. See `../../GPTShare/README.md` for details.
+Open **NNL > Result Capture Window** to configure capture and push behavior and enter an experiment name, training parameters, and notes. These fields are saved in EditorPrefs and included in each capture. Each bundle contains `console.txt`, `preview.png`, `manifest.json`, `experiment.json`, and `weights.csv`. The CSV exports every readable texel from `_NNLWeights` textures used by NNL materials in the active scene. Automatic local capture is enabled by default; automatic GitHub push is disabled by default because this repository is public. **Capture & Push Now** explicitly commits and pushes the shared folder. See `../../GPTShare/README.md` for details.
